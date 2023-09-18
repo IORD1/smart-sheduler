@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import './Home.css';
+import Logo from "./Logo";
 
 function Home() {
     const gapi = window.gapi;
@@ -130,7 +132,7 @@ function Home() {
         'RRULE:FREQ=DAILY;COUNT=1'
       ],
       'attendees': [
-        {'email': 'techmovieadd@gmail.com','responseStatus':'needsAction'},
+        {'email': 'techmovdd@gmail.com','responseStatus':'needsAction'},
       ],
       'reminders': {
         'useDefault': true,
@@ -148,10 +150,18 @@ function Home() {
     }
   return (
     <div>
-      <button id="authorize_button" hidden={accessToken && expiresIn} onClick={handleAuthClick}>Authorize</button>
-      <button id="signout_button" hidden={!accessToken && !expiresIn}   onClick={handleSignoutClick}>Sign Out</button>
-      <button id='add_manual_event' hidden={!accessToken && !expiresIn} onClick={addManualEvent}>Add Event</button>
-      <pre id="content" style={{ whiteSpace: 'pre-wrap' }}></pre>
+      <div id="autorize_home" hidden={accessToken && expiresIn}>
+        <div className="autorize_container">
+          <Logo />
+           <button id="authorize_button"  onClick={handleAuthClick}>Authorize</button>
+        </div>
+      </div>
+
+      <div id="loggedin"  hidden={!accessToken && !expiresIn}>
+        <button id="signout_button"   onClick={handleSignoutClick}>Sign Out</button>
+        <button id='add_manual_event' onClick={addManualEvent}>Add Event</button>
+        <pre id="content" style={{ whiteSpace: 'pre-wrap' }}></pre>
+      </div>
     </div>
   );
 }
