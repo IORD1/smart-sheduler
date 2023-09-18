@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import './Home.css';
 import Logo from "./Logo";
-
+import {ReactComponent as ArrowRight} from './assests/arrow_forward_FILL0_wght400_GRAD0_opsz24.svg';
 function Home() {
     const gapi = window.gapi;
   const google = window.google;
@@ -152,8 +152,19 @@ function Home() {
     <div>
       <div id="autorize_home" hidden={accessToken && expiresIn}>
         <div className="autorize_container">
-          <Logo />
-           <button id="authorize_button"  onClick={handleAuthClick}>Authorize</button>
+          <div className="header">
+            <Logo />
+            <div className="autorize-line"></div>
+            <div className="colaborators">
+              <div className="gpt icon"></div>
+              <div className="x">x</div>
+              <div className="calender icon"></div>
+            </div>
+          </div>
+           <div id="authorize_button"  onClick={handleAuthClick}>
+            <p id="button-text">Authorize</p>
+            <ArrowRight fill='#fff' style={{ height:60, width: 60 }} />
+            </div>
         </div>
       </div>
 
