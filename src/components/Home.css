@@ -1,5 +1,7 @@
-@import url('https://fonts.googleapis.com/css?family=Fuggles&display=swap');
-
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+*{
+    font-family: 'Montserrat', sans-serif;
+}
 
 
 #autorize_home{
@@ -9,13 +11,25 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
 }
 
+
+@media only screen and (max-width: 768px) {
+    /* For mobile phones: */
+   #autorize_home{
+    height: 92.6vh;
+   }
+  }
+
+  #welcomeImageText{
+    width: 40vw;
+  }
 
 .autorize_container{
     background-color: white;
     height: 80vh;
-    width: 400px;
+    width: 290px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -27,20 +41,23 @@
 .autorize-line{
     height: 2px;
     width: 80%;
-    background-color: darkgray;
+    background: linear-gradient(90deg,darkgray 90%,#66FC00);
+    /* background-color: darkgray; */
 }
 
 #authorize_button{
     width: 100%;
     height: 60px;
     color: white;
-    font-size: 2rem;
+    font-size: 1.5rem;
     background-color: black;
     border-radius: 50px;
     border: none;
     display: flex;
-    justify-content: right;
+    justify-content:center;
     align-items: center;
+    gap: 10px;
+
 }
 
 #authorize_button:hover{
@@ -50,14 +67,13 @@
 }
 
 #button-text{
-    position: absolute;
-    left: 42%;
 }
 
 .Text{
     color: black;
-    font-size: 4rem;
-    font-family: 'Fuggles', cursive;    
+    font-size: 2rem;
+    font-weight: 900;
+    /* font-family: 'Fuggles', cursive;     */
 }
 
 .header{
@@ -90,4 +106,24 @@
 
 .calender{
     background-image: url('./assests/gcalender.png');
+}
+
+#image-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+}
+#welcomeImage{
+    height: 200px;
+    width: 200px;
+    background-image: url('./assests/welcomeImage.png');
+    background-size: cover;
+
+}
+#welcomeImageText{
+    margin-top: 40px;
+    color: rgb(110, 108, 108);
+    width:200px;
 }

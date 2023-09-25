@@ -132,7 +132,7 @@ function Home() {
         'RRULE:FREQ=DAILY;COUNT=1'
       ],
       'attendees': [
-        {'email': 'techmovdd@gmail.com','responseStatus':'needsAction'},
+        {'email': 'tecasdhmovdd@gmail.com','responseStatus':'needsAction'},
       ],
       'reminders': {
         'useDefault': true,
@@ -150,7 +150,7 @@ function Home() {
     }
   return (
     <div>
-      <div id="autorize_home" hidden={accessToken && expiresIn}>
+      <div id="autorize_home" hidden={accessToken}>
         <div className="autorize_container">
           <div className="header">
             <Logo />
@@ -161,10 +161,14 @@ function Home() {
               <div className="calender icon"></div>
             </div>
           </div>
+          <div id="image-container">
+            <div id="welcomeImage"></div>
+            <div id="welcomeImageText">Shedule task and Plan your day with ease</div>
+          </div>
            <div id="authorize_button"  onClick={handleAuthClick}>
             <p id="button-text">Authorize</p>
-            <ArrowRight fill='#fff' style={{ height:60, width: 60 }} />
-            </div>
+            <ArrowRight fill='#66FC00' style={{ height:30, width: 30 }} />
+          </div>
         </div>
       </div>
 
