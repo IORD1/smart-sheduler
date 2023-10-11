@@ -55,6 +55,8 @@ function Home() {
   //Enables user interaction after all libraries are loaded.
 
   function handleAuthClick() {
+    // document.getElementById("autorize_home").hidden = true;
+    document.getElementById("autorize_home").style.display = "none";
     tokenClient.callback = async (resp) => {
       if (resp.error) {
         throw (resp);
@@ -87,6 +89,7 @@ function Home() {
   }
 
   async function listUpcomingEvents() {
+    // document.getElementById('autorize_home').hidden = "true";
     let response;
     try {
       const request = {
@@ -112,6 +115,9 @@ function Home() {
     const output = events.reduce(
       (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,'Events:\n');
     document.getElementById('content').innerText = output;
+    // document.getElementById('autorize_home').hidden = "true";
+    document.getElementById("autorize_home").style.display = "none";
+
   }
   
   function addManualEvent(){
@@ -132,7 +138,7 @@ function Home() {
         'RRULE:FREQ=DAILY;COUNT=1'
       ],
       'attendees': [
-        {'email': 'tecasdhmovdd@gmail.com','responseStatus':'needsAction'},
+        {'email': 'tecasdhsafdsmovdd@gmail.com','responseStatus':'needsAction'},
       ],
       'reminders': {
         'useDefault': true,
@@ -150,7 +156,7 @@ function Home() {
     }
   return (
     <div>
-      <div id="autorize_home" hidden={accessToken}>
+      <div id="autorize_home" >
         <div className="autorize_container">
           <div className="header">
             <Logo />
@@ -173,9 +179,11 @@ function Home() {
       </div>
 
       <div id="loggedin"  hidden={!accessToken && !expiresIn}>
-        <button id="signout_button"   onClick={handleSignoutClick}>Sign Out</button>
-        <button id='add_manual_event' onClick={addManualEvent}>Add Event</button>
-        <pre id="content" style={{ whiteSpace: 'pre-wrap' }}></pre>
+        <div id="homescreen">
+            <button id="signout_button"   onClick={handleSignoutClick}>Sign Out</button>
+            <button id='add_manual_event' onClick={addManualEvent}>Add Event</button>
+            <pre id="content" style={{ whiteSpace: 'pre-wrap' }}></pre>
+        </div>
       </div>
     </div>
   );
