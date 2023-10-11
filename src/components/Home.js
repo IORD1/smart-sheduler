@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import './Home.css';
 import Logo from "./Logo";
 import {ReactComponent as ArrowRight} from './assests/arrow_forward_FILL0_wght400_GRAD0_opsz24.svg';
+import {ReactComponent as LogutIcons} from './assests/logout.svg';
+import {ReactComponent as SendIcon} from './assests/sendicon.svg';
 function Home() {
     const gapi = window.gapi;
   const google = window.google;
@@ -180,9 +182,21 @@ function Home() {
 
       <div id="loggedin"  hidden={!accessToken && !expiresIn}>
         <div id="homescreen">
-            <button id="signout_button"   onClick={handleSignoutClick}>Sign Out</button>
-            <button id='add_manual_event' onClick={addManualEvent}>Add Event</button>
-            <pre id="content" style={{ whiteSpace: 'pre-wrap' }}></pre>
+          <div id="navbar">
+            <div id="date-container"></div>
+            <button id="signout_button"   onClick={handleSignoutClick}>
+              <LogutIcons fill='#da2626' style={{ height:25, width: 25 }} />
+            </button>
+          </div>
+          <div id="event_container">
+              <pre id="content" style={{ whiteSpace: 'pre-wrap' }}></pre>
+          </div>
+          <div id="navbar">
+            <div id="date-container"></div>
+            <button id='add_manual_event' onClick={addManualEvent}>
+              <SendIcon fill='#57d601' style={{ height:25, width: 25 }} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
