@@ -197,7 +197,7 @@ function Home() {
               <SendIcon fill='#57d601' style={{ height:25, width: 25 }} />
             </button>
           </div>
-        </div>
+        </div>  
       </div>
     </div>
   );
