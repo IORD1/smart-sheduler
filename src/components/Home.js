@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect ,useState} from "react";
 import './Home.css';
 import Logo from "./Logo";
 import {ReactComponent as ArrowRight} from './assests/arrow_forward_FILL0_wght400_GRAD0_opsz24.svg';
 import {ReactComponent as LogutIcons} from './assests/logout.svg';
 import {ReactComponent as SendIcon} from './assests/sendicon.svg';
 function Home() {
+  const [eventData, setevetData] = useState();
     const gapi = window.gapi;
   const google = window.google;
 
@@ -93,10 +94,18 @@ function Home() {
   async function listUpcomingEvents() {
     // document.getElementById('autorize_home').hidden = "true";
     let response;
+    const today = new Date();
+    // today.setHours(0, 0, 0, 0); // Set time to the beginning of the day
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1); // Set time to the beginning of the next day
+
     try {
       const request = {
         'calendarId': 'primary',
-        'timeMin': (new Date()).toISOString(),
+        // 'timeMin': (new Date()).toISOString(),
+        'timeMin': today.toISOString(),
+        'timeMax': tomorrow.toISOString(),
         'showDeleted': false,
         'singleEvents': true,
         'maxResults': 10,
@@ -109,17 +118,23 @@ function Home() {
     }
 
     const events = response.result.items;
+    setevetData(events);
     if (!events || events.length === 0) {
       document.getElementById('content').innerText = 'No events found.';
       return;
     }
     // Flatten to string to display
-    const output = events.reduce(
-      (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,'Events:\n');
-    document.getElementById('content').innerText = output;
+    console.log(events);
+    // for(let eachEvent in events){
+    //   console.log(eachEvent);
+    // }
+
+
+    // const output = events.reduce(
+    //   (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,'\n');
+    // document.getElementById('content').innerText = output;
     // document.getElementById('autorize_home').hidden = "true";
     document.getElementById("autorize_home").style.display = "none";
-
   }
   
   function addManualEvent(){
@@ -189,7 +204,14 @@ function Home() {
             </button>
           </div>
           <div id="event_container">
-              <pre id="content" style={{ whiteSpace: 'pre-wrap' }}></pre>
+              <pre id="content" style={{ whiteSpace: 'pre-wrap' }}>
+                {eventData ? eventData.map(item => {
+                  return <div className="eventBars" key={item.id}>
+                    <p>{item.summary}</p> 
+                    {item.start.date? <p>All Day</p> : <p>{item.start.dateTime} -to- {item.end.dateTime}</p>}
+                  </div>
+                }) : <>No Data found</>}
+              </pre>
           </div>
           <div id="navbar">
             <div id="date-container"></div>
