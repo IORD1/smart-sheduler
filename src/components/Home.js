@@ -6,6 +6,9 @@ import {ReactComponent as LogutIcons} from './assests/logout.svg';
 import {ReactComponent as SendIcon} from './assests/sendicon.svg';
 function Home() {
   const [eventData, setevetData] = useState();
+  const [indexEvent, setIndexEvent] = useState(1);
+  const backgroundColors = ["#ec3a5a", "#fb8231", "#fdf9a0","#20bf6b","#349cdb","#3e6dd7","#8c59d0"];
+  const fontColors = ["#ffffff","#ffffff","#0e0e0e","#ffffff","#ffffff","#ffffff","#ffffff",]
     const gapi = window.gapi;
   const google = window.google;
 
@@ -124,7 +127,7 @@ function Home() {
       return;
     }
     // Flatten to string to display
-    console.log(events);
+    // console.log(events);
     // for(let eachEvent in events){
     //   console.log(eachEvent);
     // }
@@ -170,6 +173,21 @@ function Home() {
       },(error)=>{
         console.error(error);
       });
+
+    }
+    function convertDateTime(dataTime){
+      // const dateTimeString = '2023-12-15T13:00:00+05:30';
+      const dateTime = new Date(dataTime);
+      let hours = dateTime.getHours();
+      const minutes = dateTime.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      
+      // Convert to 12-hour clock format
+      hours = hours % 12 || 12;
+      
+      // Formatting the time to hh:mm AM/PM format
+      const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+            return formattedTime;
     }
   return (
     <div>
@@ -198,20 +216,39 @@ function Home() {
       <div id="loggedin"  hidden={!accessToken && !expiresIn}>
         <div id="homescreen">
           <div id="navbar">
-            <div id="date-container"></div>
+            {/* <div id="date-container"></div>
             <button id="signout_button"   onClick={handleSignoutClick}>
               <LogutIcons fill='#da2626' style={{ height:25, width: 25 }} />
-            </button>
+            </button> */}
+
+            <p>Today</p>
+          </div>
+          <div id="tab-row">
+            <div className="sheduleTab" id="SelectedTab">
+              Schedule
+            </div>
+            <div className="sheduleTab">
+              Tasks
+            </div>
           </div>
           <div id="event_container">
-              <pre id="content" style={{ whiteSpace: 'pre-wrap' }}>
-                {eventData ? eventData.map(item => {
-                  return <div className="eventBars" key={item.id}>
-                    <p>{item.summary}</p> 
-                    {item.start.date? <p>All Day</p> : <p>{item.start.dateTime} -to- {item.end.dateTime}</p>}
+                {(eventData && eventData.length) ? eventData.map((item,index) => {
+                  return <div 
+                  className="eventBars" 
+                  key={item.id} 
+                  style={{     
+                    color : fontColors[index % fontColors.length],
+                    backgroundColor: backgroundColors[index % backgroundColors.length],
+                    borderRadius: `${index === 0 ? '5px 5px 0 0' : ''}${index === eventData.length - 1 ? '0 0 5px 5px' : ''}`,
+                  }}
+                  >
+                    <p className="eventIndex">{index+1}</p>
+                    
+                    {item.start.date? <p className="eventTimes allDayEvent">All Day</p> : <div className="eventTimes"><p>{convertDateTime(item.start.dateTime)}</p><p> {convertDateTime(item.end.dateTime)}</p></div>}
+                    
+                    <p className="eventSummary">{item.summary}</p> 
                   </div>
                 }) : <>No Data found</>}
-              </pre>
           </div>
           <div id="navbar">
             <div id="date-container"></div>
