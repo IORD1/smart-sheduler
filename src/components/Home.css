@@ -129,7 +129,8 @@
 }
 
 #loggedin{
-    background-color: whitesmoke;
+    /* background-color: whitesmoke; */             
+    background-image: url('./assests/shapes-light.png');
     height: 100vh;
     width: 100vw;
     display: flex;
@@ -166,28 +167,8 @@
 }
 
 
-#date-container{
-    width: 75%;
-    height: 93%;
-    border: 2px solid #26282a;
-    border-radius: 40px 0px 0px 40px;
-    /* background-color: #66FC00; */
-}
 
-#signout_button{
-    width: 25%;
-    height: 100%;
-    color: white;
-    font-size: 1.5rem;
-    background-color: #da2626;
-    background-color: #26282a;
-    border-radius:0px 40px 40px 0px;
-    border: none;
-    display: flex;
-    justify-content:center;
-    align-items: center;
 
-}
 
 #event_container{
     width: 100%;
@@ -200,10 +181,6 @@
     height: 100%;
     color: white;
     font-size: 1.5rem;
-    background-color: #da2626;
-    background-color: #57d601;
-    background-color: #26282a;
-    border-radius:0px 40px 40px 0px;
     border: none;
     display: flex;
     justify-content:center;
@@ -211,7 +188,6 @@
 }
 
 .eventBars{
-    background-color: aqua;
     box-sizing: border-box;
     display: flex;
     height: 13%;
@@ -247,7 +223,7 @@
     align-items: center    ;
 }
 
-#SelectedTab{
+.selectedTab{
     background-color: #585858;
 }
 
@@ -279,4 +255,9 @@
     border-radius: 5px;
     padding-top : 5px;
     padding-bottom: 5px ;
+}
+
+
+#tasks_container{
+    height: 80%;
 }

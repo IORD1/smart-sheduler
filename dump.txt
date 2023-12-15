@@ -1,0 +1,8 @@
+ <div id="navbar">
+            <div id="input-terminal"></div>
+            <button id='add_manual_event' onClick={addManualEvent}>
+              <SendIcon fill='#57d601' style={{ height:25, width: 25 }} />
+            </button>
+          </div>
+
+          -----------------------------------------------------

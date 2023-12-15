@@ -6,7 +6,8 @@ import {ReactComponent as LogutIcons} from './assests/logout.svg';
 import {ReactComponent as SendIcon} from './assests/sendicon.svg';
 function Home() {
   const [eventData, setevetData] = useState();
-  const [indexEvent, setIndexEvent] = useState(1);
+  const [activeTab, setActiveTab] = useState('schedule'); // 'schedule' or 'tasks'
+  const [todos, setTodos] = useState([]);
   const backgroundColors = ["#ec3a5a", "#fb8231", "#fdf9a0","#20bf6b","#349cdb","#3e6dd7","#8c59d0"];
   const fontColors = ["#ffffff","#ffffff","#0e0e0e","#ffffff","#ffffff","#ffffff","#ffffff",]
     const gapi = window.gapi;
@@ -189,6 +190,15 @@ function Home() {
       const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
             return formattedTime;
     }
+
+    function handleTabClick(tab) {
+      setActiveTab(tab);
+    }
+  
+    function handleAddTodoClick(todoText) {
+      setTodos([...todos, todoText]);
+    }
+  
   return (
     <div>
       <div id="autorize_home" >
@@ -224,14 +234,21 @@ function Home() {
             <p>Today</p>
           </div>
           <div id="tab-row">
-            <div className="sheduleTab" id="SelectedTab">
+            <div
+              className={`sheduleTab ${activeTab === 'schedule' ? 'selectedTab' : ''}`}
+              onClick={() => handleTabClick('schedule')}
+            >
               Schedule
             </div>
-            <div className="sheduleTab">
+            <div
+              className={`sheduleTab ${activeTab === 'tasks' ? 'selectedTab' : ''}`}
+              onClick={() => handleTabClick('tasks')}
+            >
               Tasks
             </div>
           </div>
-          <div id="event_container">
+          {activeTab === 'schedule' ? (
+        <div id="event_container">
                 {(eventData && eventData.length) ? eventData.map((item,index) => {
                   return <div 
                   className="eventBars" 
@@ -249,17 +266,58 @@ function Home() {
                     <p className="eventSummary">{item.summary}</p> 
                   </div>
                 }) : <>No Data found</>}
-          </div>
-          <div id="navbar">
-            <div id="date-container"></div>
-            <button id='add_manual_event' onClick={addManualEvent}>
-              <SendIcon fill='#57d601' style={{ height:25, width: 25 }} />
-            </button>
-          </div>
+          </div> ) : (
+        <div id="tasks_container">
+          <TodoInput onAddTodo={handleAddTodoClick} />
+          <TodoList todos={todos} />
+        </div>
+      )}
         </div>  
       </div>
     </div>
   );
 }
+
+
+function TodoInput({ onAddTodo }) {
+  const [todoText, setTodoText] = useState('');
+
+  function handleInputChange(e) {
+    setTodoText(e.target.value);
+  }
+
+  function handleAddTodo() {
+    if (todoText.trim() !== '') {
+      onAddTodo(todoText);
+      setTodoText('');
+    }
+  }
+
+  return (
+    <div className="todoInputContainer">
+      <input
+        type="text"
+        placeholder="Enter your todo..."
+        value={todoText}
+        onChange={handleInputChange}
+      />
+      <button onClick={handleAddTodo}>Add Todo</button>
+    </div>
+  );
+}
+
+function TodoList({ todos }) {
+  return (
+    <div className="todoListContainer">
+      <p>Your Todos:</p>
+      <ul>
+        {todos.map((todo, index) => (
+          <li key={index}>{todo}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 
 export default Home;
