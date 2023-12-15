@@ -1,3 +1,11 @@
+
+
+## A Smart Way to Schedule Stuff
+
+![image](https://github.com/IORD1/smart-sheduler/assets/91962775/379d100f-e406-4e37-8647-94d86b36e1c7)
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
