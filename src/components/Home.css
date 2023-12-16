@@ -193,7 +193,7 @@
     height: 13%;
     align-items: center;
     border-bottom: 1px solid black;
-    justify-content: start;
+    justify-content: flex-start;
 }
 
 .eventBars p{
@@ -289,7 +289,7 @@
     height: 15%;
     align-items: center;
     border-bottom: 1px solid black;
-    justify-content: start;
+    justify-content: flex-start;
     overflow: hidden;
 }
 

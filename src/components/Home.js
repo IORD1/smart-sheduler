@@ -2,8 +2,6 @@ import { useEffect ,useState} from "react";
 import './Home.css';
 import Logo from "./Logo";
 import {ReactComponent as ArrowRight} from './assests/arrow_forward_FILL0_wght400_GRAD0_opsz24.svg';
-import {ReactComponent as LogutIcons} from './assests/logout.svg';
-import {ReactComponent as SendIcon} from './assests/sendicon.svg';
 function Home() {
   const [eventData, setevetData] = useState();
   const [activeTab, setActiveTab] = useState('schedule'); // 'schedule' or 'tasks'
@@ -22,12 +20,25 @@ function Home() {
   const expiresIn = localStorage.getItem('expires_in');
 
   let gapiInited = false, gisInited = false, tokenClient;
-
+  console.log(gapiInited+gisInited)
   useEffect(() => {
     //const expiryTime = new Date().getTime() + expiresIn * 1000;
-    gapiLoaded()
-    gisLoaded()
-  }, [])
+    gapiLoaded();
+    gisLoaded();
+    window.addEventListener('keydown', handleKeyDown);
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  })
+
+  function handleKeyDown(event) {
+    // Check if Ctrl key is pressed and Arrow Right key is pressed
+    if (event.ctrlKey && event.key === 'ArrowRight') {
+      // Switch between 'schedule' and 'tasks'
+      setActiveTab(activeTab === 'schedule' ? 'tasks' : 'schedule');
+    }
+  }
 
   function gapiLoaded() {
     gapi.load('client', initializeGapiClient);
@@ -86,14 +97,14 @@ function Home() {
 
   //Sign out the user upon button click.
 
-  function handleSignoutClick() {
-    const token = gapi.client.getToken();
-    if (token !== null) {
-      google.accounts.oauth2.revoke(token.access_token);
-      gapi.client.setToken('');
-      localStorage.clear();
-    }
-  }
+  // function handleSignoutClick() {
+  //   const token = gapi.client.getToken();
+  //   if (token !== null) {
+  //     google.accounts.oauth2.revoke(token.access_token);
+  //     gapi.client.setToken('');
+  //     localStorage.clear();
+  //   }
+  // }
 
   async function listUpcomingEvents() {
     // document.getElementById('autorize_home').hidden = "true";
@@ -141,41 +152,44 @@ function Home() {
     document.getElementById("autorize_home").style.display = "none";
   }
   
-  function addManualEvent(){
-    var event = {
-      'kind': 'calendar#event',
-      'summary': 'Event 2',
-      'location': 'Masai School, Bangalore',
-      'description': 'Paty time',
-      'start': {
-        'dateTime': '2023-03-18T01:05:00.000Z',
-        'timeZone': 'UTC'
-      },
-      'end': {
-        'dateTime': '2023-03-18T01:35:00.000Z',
-        'timeZone': 'UTC'
-      },
-      'recurrence': [
-        'RRULE:FREQ=DAILY;COUNT=1'
-      ],
-      'attendees': [
-        {'email': 'tecasdhsafdsmovdd@gmail.com','responseStatus':'needsAction'},
-      ],
-      'reminders': {
-        'useDefault': true,
-      },
-      "guestsCanSeeOtherGuests": true,
-    }
+  // function addManualEvent(){
+  //   var event = {
+  //     'kind': 'calendar#event',
+  //     'summary': 'Event 2',
+  //     'location': 'Masai School, Bangalore',
+  //     'description': 'Paty time',
+  //     'start': {
+  //       'dateTime': '2023-03-18T01:05:00.000Z',
+  //       'timeZone': 'UTC'
+  //     },
+  //     'end': {
+  //       'dateTime': '2023-03-18T01:35:00.000Z',
+  //       'timeZone': 'UTC'
+  //     },
+  //     'recurrence': [
+  //       'RRULE:FREQ=DAILY;COUNT=1'
+  //     ],
+  //     'attendees': [
+  //       {'email': 'tecasdhsafdsmovdd@gmail.com','responseStatus':'needsAction'},
+  //     ],
+  //     'reminders': {
+  //       'useDefault': true,
+  //     },
+  //     "guestsCanSeeOtherGuests": true,
+  //   }
 
-      var request = gapi.client.calendar.events.insert({'calendarId': 'primary','resource': event,'sendUpdates': 'all'});
-      request.execute((event)=>{
-          console.log(event)
-          window.open(event.htmlLink)
-      },(error)=>{
-        console.error(error);
-      });
+  //     var request = gapi.client.calendar.events.insert({'calendarId': 'primary','resource': event,'sendUpdates': 'all'});
+  //     request.execute((event)=>{
+  //         console.log(event)
+  //         window.open(event.htmlLink)
+  //     },(error)=>{
+  //       console.error(error);
+  //     });
 
-    }
+  //   }
+
+
+  
     function convertDateTime(dataTime){
       // const dateTimeString = '2023-12-15T13:00:00+05:30';
       const dateTime = new Date(dataTime);
@@ -295,13 +309,10 @@ function TodoInput({ onAddTodo }) {
   }
 
   function parseTodoText(text) {
-    console.log(text)
-    const regex = /(.+)\s?@(\d+)?/;
+    const regex = /(.+)\s?@(\d+(\.\d+)?)?/;
     const match = text.match(regex);
     const task = match ? match[1].trim() : text.trim();
     const time = match ? match[2] : null;
-    console.log(task)
-    console.log(time)
     return [task, time];
   }
 
