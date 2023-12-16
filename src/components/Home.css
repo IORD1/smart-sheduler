@@ -51,7 +51,7 @@
     color: white;
     font-size: 1.5rem;
     background-color: #26282a;
-    border-radius: 50px;
+    border-radius: 5px;
     border: none;
     display: flex;
     justify-content:center;
@@ -259,5 +259,92 @@
 
 
 #tasks_container{
+    height: 78%;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.todoListContainer{
+    height: 85%;
+    overflow: scroll;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.todoListContainer::-webkit-scrollbar {
+    display: none;
+  }
+
+.todoInputContainer{
+    height: 15%;
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.taskbars{
+    box-sizing: border-box;
+    display: flex;
+    height: 15%;
+    align-items: center;
+    border-bottom: 1px solid black;
+    justify-content: start;
+    overflow: hidden;
+}
+
+#taskIndex{
+    width: 15%;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+#taskSummary{
+    font-size: 0.9rem;
+    font-weight: 650;
+    width: 70%;
+    text-align: start;
+    padding-left: 10px;
+    overflow: hidden;
+    padding: 10px;
     height: 80%;
+    display: flex;
+    align-items: center;
+}
+
+#todoInput{
+    background-color: transparent;
+    border: 1px solid #585858;
+    border-radius: 5px 0px 0px 5px;
+    height: 60%;
+    width: 85%;    
+    padding-left: 10px;
+    color: white;
+    font-size: 1rem;
+}
+
+#todoInput:focus,
+#todoInput:active{
+    border: 1px solid #585858;
+    box-shadow: none;
+    outline: none;
+}
+
+#todoSend{
+    border-radius: 0px 5px 5px 0px;
+    width: 15%;
+    height: 67%;
+    background-color: #585858;
+    border: none;
+}
+
+
+#taskTime{
+    width: 15%;
+    border: 1px solid;
+    border-radius: 15px;
+    margin-right: 10px;
+    font-weight: 200;
+    padding-left: 5px;
+    padding-right: 5px ;
 }

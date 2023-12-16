@@ -117,14 +117,14 @@ function Home() {
       };
       response = await gapi.client.calendar.events.list(request);
     } catch (err) {
-      document.getElementById('content').innerText = err.message;
+      document.getElementById('event_container').innerText = err.message;
       return;
     }
 
     const events = response.result.items;
     setevetData(events);
     if (!events || events.length === 0) {
-      document.getElementById('content').innerText = 'No events found.';
+      document.getElementById('event_container').innerText = 'No events found.';
       return;
     }
     // Flatten to string to display
@@ -268,8 +268,8 @@ function Home() {
                 }) : <>No Data found</>}
           </div> ) : (
         <div id="tasks_container">
-          <TodoInput onAddTodo={handleAddTodoClick} />
           <TodoList todos={todos} />
+          <TodoInput onAddTodo={handleAddTodoClick} />
         </div>
       )}
         </div>  
@@ -288,9 +288,21 @@ function TodoInput({ onAddTodo }) {
 
   function handleAddTodo() {
     if (todoText.trim() !== '') {
-      onAddTodo(todoText);
+      const [task, time] = parseTodoText(todoText);
+      onAddTodo({ task, time });
       setTodoText('');
     }
+  }
+
+  function parseTodoText(text) {
+    console.log(text)
+    const regex = /(.+)\s?@(\d+)?/;
+    const match = text.match(regex);
+    const task = match ? match[1].trim() : text.trim();
+    const time = match ? match[2] : null;
+    console.log(task)
+    console.log(time)
+    return [task, time];
   }
 
   return (
@@ -300,21 +312,39 @@ function TodoInput({ onAddTodo }) {
         placeholder="Enter your todo..."
         value={todoText}
         onChange={handleInputChange}
+        id="todoInput"
       />
-      <button onClick={handleAddTodo}>Add Todo</button>
+      <button id="todoSend" onClick={handleAddTodo}>-</button>
     </div>
   );
 }
 
 function TodoList({ todos }) {
+  const backgroundColors = ["#ec3a5a", "#fb8231", "#fdf9a0","#20bf6b","#349cdb","#3e6dd7","#8c59d0"];
+  const fontColors = ["#ffffff","#ffffff","#0e0e0e","#ffffff","#ffffff","#ffffff","#ffffff",]
   return (
     <div className="todoListContainer">
-      <p>Your Todos:</p>
-      <ul>
         {todos.map((todo, index) => (
-          <li key={index}>{todo}</li>
+          <div 
+          className="taskbars" 
+          key={index}
+          style={{     
+            color : fontColors[index % fontColors.length],
+            backgroundColor: backgroundColors[index % backgroundColors.length],
+            borderRadius: `${index === 0 ? '5px 5px 0 0' : ''}${index === todos.length - 1 ? '0 0 5px 5px' : ''}`,
+          }}
+          >
+            <div id="taskIndex">{index+1}</div>
+            <div id="taskSummary">{todo.task}</div>
+            <div id="taskTime"
+            style={{
+              borderColor : fontColors[index % fontColors.length],
+            }}
+            >
+              {todo.time ? `${todo.time} hr` : '-'}
+            </div>
+          </div>
         ))}
-      </ul>
     </div>
   );
 }
