@@ -2,6 +2,7 @@ import { useEffect ,useState} from "react";
 import './Home.css';
 import Logo from "./Logo";
 import {ReactComponent as ArrowRight} from './assests/arrow_forward_FILL0_wght400_GRAD0_opsz24.svg';
+import TodayDate from "./TodayDate";
 function Home() {
   const [eventData, setevetData] = useState();
   const [activeTab, setActiveTab] = useState('schedule'); // 'schedule' or 'tasks'
@@ -20,7 +21,7 @@ function Home() {
   const expiresIn = localStorage.getItem('expires_in');
 
   let gapiInited = false, gisInited = false, tokenClient;
-  console.log(gapiInited+gisInited)
+  // console.log(gapiInited+gisInited)
   useEffect(() => {
     //const expiryTime = new Date().getTime() + expiresIn * 1000;
     gapiLoaded();
@@ -97,14 +98,14 @@ function Home() {
 
   //Sign out the user upon button click.
 
-  // function handleSignoutClick() {
-  //   const token = gapi.client.getToken();
-  //   if (token !== null) {
-  //     google.accounts.oauth2.revoke(token.access_token);
-  //     gapi.client.setToken('');
-  //     localStorage.clear();
-  //   }
-  // }
+  function handleSignoutClick() {
+    const token = gapi.client.getToken();
+    if (token !== null) {
+      google.accounts.oauth2.revoke(token.access_token);
+      gapi.client.setToken('');
+      localStorage.clear();
+    }
+  }
 
   async function listUpcomingEvents() {
     // document.getElementById('autorize_home').hidden = "true";
@@ -189,6 +190,8 @@ function Home() {
   //   }
 
 
+
+
   
     function convertDateTime(dataTime){
       // const dateTimeString = '2023-12-15T13:00:00+05:30';
@@ -211,6 +214,12 @@ function Home() {
   
     function handleAddTodoClick(todoText) {
       setTodos([...todos, todoText]);
+    }
+
+
+    function sheduleEvents(){
+      console.log("clicked");
+      console.log(eventData);
     }
   
   return (
@@ -244,8 +253,16 @@ function Home() {
             <button id="signout_button"   onClick={handleSignoutClick}>
               <LogutIcons fill='#da2626' style={{ height:25, width: 25 }} />
             </button> */}
-
-            <p>Today</p>
+            <div id="logoutButton"  onClick={handleSignoutClick}>
+              <ArrowRight fill='#ebb6b6' style={{ height:30, width: 30,rotate:"180deg" }} />
+            </div>
+            <div>
+              <p>Today</p>
+              <TodayDate/>
+            </div>
+            <div id="sheduleItButton" onClick={sheduleEvents}>
+              <ArrowRight fill='#a9e97e' style={{ height:30, width: 30 }} />
+            </div>
           </div>
           <div id="tab-row">
             <div
