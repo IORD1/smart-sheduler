@@ -3,6 +3,8 @@ import './Home.css';
 import Logo from "./Logo";
 import {ReactComponent as ArrowRight} from './assests/arrow_forward_FILL0_wght400_GRAD0_opsz24.svg';
 import TodayDate from "./TodayDate";
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 function Home() {
   const [eventData, setevetData] = useState();
   const [activeTab, setActiveTab] = useState('schedule'); // 'schedule' or 'tasks'
@@ -19,9 +21,9 @@ function Home() {
 
   const accessToken = localStorage.getItem('access_token');
   const expiresIn = localStorage.getItem('expires_in');
+  const genAI = new GoogleGenerativeAI("AIzaSyArPJf6Oy5YpOJ5LVjCj6Nfekz9et5T2pA");
 
   let gapiInited = false, gisInited = false, tokenClient;
-  // console.log(gapiInited+gisInited)
   useEffect(() => {
     //const expiryTime = new Date().getTime() + expiresIn * 1000;
     gapiLoaded();
@@ -119,7 +121,6 @@ function Home() {
     try {
       const request = {
         'calendarId': 'primary',
-        // 'timeMin': (new Date()).toISOString(),
         'timeMin': today.toISOString(),
         'timeMax': tomorrow.toISOString(),
         'showDeleted': false,
@@ -139,71 +140,57 @@ function Home() {
       document.getElementById('event_container').innerText = 'No events found.';
       return;
     }
-    // Flatten to string to display
-    // console.log(events);
-    // for(let eachEvent in events){
-    //   console.log(eachEvent);
-    // }
-
-
-    // const output = events.reduce(
-    //   (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,'\n');
-    // document.getElementById('content').innerText = output;
-    // document.getElementById('autorize_home').hidden = "true";
     document.getElementById("autorize_home").style.display = "none";
   }
   
-  // function addManualEvent(){
-  //   var event = {
-  //     'kind': 'calendar#event',
-  //     'summary': 'Event 2',
-  //     'location': 'Masai School, Bangalore',
-  //     'description': 'Paty time',
-  //     'start': {
-  //       'dateTime': '2023-03-18T01:05:00.000Z',
-  //       'timeZone': 'UTC'
-  //     },
-  //     'end': {
-  //       'dateTime': '2023-03-18T01:35:00.000Z',
-  //       'timeZone': 'UTC'
-  //     },
-  //     'recurrence': [
-  //       'RRULE:FREQ=DAILY;COUNT=1'
-  //     ],
-  //     'attendees': [
-  //       {'email': 'tecasdhsafdsmovdd@gmail.com','responseStatus':'needsAction'},
-  //     ],
-  //     'reminders': {
-  //       'useDefault': true,
-  //     },
-  //     "guestsCanSeeOtherGuests": true,
-  //   }
+  function addManualEvent(){
+    var event = {
+      'kind': 'calendar#event',
+      'summary': 'Drive to work',
+      'location': 'Wardha',
+      'description': 'Get the keys, and start car',
+      'start': {
+        'dateTime': '2023-12-29T23:05:00.000Z',
+        'timeZone': 'UTC'
+      },
+      'end': {
+        'dateTime': '2023-12-29T23:35:00.000Z',
+        'timeZone': 'UTC'
+      },
+      'recurrence': [
+        'RRULE:FREQ=DAILY;COUNT=1'
+      ],
+      'attendees': [
+        {'email': 'pratham111ingole@gmail.com','responseStatus':'needsAction'},
+      ],
+      'reminders': {
+        'useDefault': true,
+      },
+      "guestsCanSeeOtherGuests": true,
+    }
 
-  //     var request = gapi.client.calendar.events.insert({'calendarId': 'primary','resource': event,'sendUpdates': 'all'});
-  //     request.execute((event)=>{
-  //         console.log(event)
-  //         window.open(event.htmlLink)
-  //     },(error)=>{
-  //       console.error(error);
-  //     });
+      var request = gapi.client.calendar.events.insert({'calendarId': 'primary','resource': event,'sendUpdates': 'all'});
+      request.execute((event)=>{
+          console.log(event)
+          window.open(event.htmlLink)
+      },(error)=>{
+        console.error(error);
+      });
 
-  //   }
+    }
 
 
 
 
   
     function convertDateTime(dataTime){
-      // const dateTimeString = '2023-12-15T13:00:00+05:30';
       const dateTime = new Date(dataTime);
       let hours = dateTime.getHours();
       const minutes = dateTime.getMinutes();
       const ampm = hours >= 12 ? 'PM' : 'AM';
       
-      // Convert to 12-hour clock format
       hours = hours % 12 || 12;
       
-      // Formatting the time to hh:mm AM/PM format
       const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
             return formattedTime;
     }
@@ -217,10 +204,123 @@ function Home() {
     }
 
 
+    function createEventSentences(events){
+      return events.map((event) => {
+        const summary = event.summary;
+        const startTime = new Date(event.start.dateTime);
+        const endTime = new Date(event.end.dateTime);
+    
+        const formattedStartTime = startTime.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: 'numeric',
+        });
+    
+        const formattedEndTime = endTime.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: 'numeric',
+        });
+    
+        return `I have to ${summary} scheduled from ${formattedStartTime} to ${formattedEndTime}.`;
+      });
+    }
+
+    function createTodoSentences(todos) {
+      return todos.map((todo) => {
+        const task = todo.task;
+        const time = parseFloat(todo.time); // Parse time as float
+        const formattedTime = formatTime(time);
+    
+        return `I want to do ${task} and require ${formattedTime} time.`;
+      });
+    }
+    
+    // Helper function to format time
+    function formatTime(time) {
+      const hours = Math.floor(time);
+      const minutes = Math.round((time - hours) * 60);
+    
+      if (hours === 0) {
+        return `${minutes} min`;
+      } else if (hours === 1) {
+        return `${hours} hr ${minutes} min`;
+      } else {
+        return `${hours} hrs ${minutes} min`;
+      }
+    }
+
+    function printTodos(todoDataString) {
+      try {
+        // Parse the string into a JSON object
+        const todoData = JSON.parse(todoDataString);
+    
+        // Check if the parsed object has a "todos" property
+        if (todoData && todoData.todos && Array.isArray(todoData.todos)) {
+          // Iterate over each todo and print its name and time
+          todoData.todos.forEach(todo => {
+            console.log(`Todo: ${todo.task}, Start Time: ${todo.start_time}, End Time: ${todo.end_time}`);
+          });
+        } else {
+          console.error('Invalid todo data format.');
+        }
+      } catch (error) {
+        console.error('Error parsing todo data:', error.message);
+      }
+    }
+
+    async function run(prompt) {
+      const model = genAI.getGenerativeModel({ model: "gemini-pro"});    
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      // Find the indices of the first and second occurrences of ```
+      const firstBackticksIndex = text.indexOf('{');
+      const secondBackticksIndex = text.lastIndexOf("```");
+
+      // Extract the substring between the first and second occurrences of ```
+      const trimmedTodoDataString = text.slice(firstBackticksIndex , secondBackticksIndex);
+      let modifiedString = trimmedTodoDataString.replace(/"\btodo\b"/g, '"task"');
+      modifiedString = modifiedString.replace(/"\bname\b"/g, '"task"');
+      modifiedString = modifiedString.replace(/"\bscheduled_todos\b"/g, '"todos"');
+
+
+      console.log(modifiedString);
+      printTodos(modifiedString);
+      // addManualEvent();
+    }
+    
+
+
     function sheduleEvents(){
       console.log("clicked");
-      console.log(eventData);
+
+      // console.log(eventData);
+
+      const eventSentences = createEventSentences(eventData);
+      const todoSentences = createTodoSentences(todos);
+
+      // Output the sentences
+      // console.log(eventSentences.join('\n'));
+      // // console.log(todos);
+      // console.log(todoSentences.join('\n'));
+
+
+      let prompt = "Create a schedule for me, for given todos based on the time it takes to do each todo. I have already scheduled the following events which cannot be re-scheduled which are : \n "
+      + eventSentences.join('\n') 
+      + " Now create scheduled for the following todo. Also take in account the time it takes to complete each todo. The list of todos are : \n"
+      + todoSentences.join('\n')
+      + " .\n Return a json object consisting of list of scheduled todos and the starting and ending time for each task as per you."
+      + " The new schedule should not overlap with already sheduled tasks. Do not add the already scheduled task in this json object.  Take in account that I start working at 9 am till 10pm. Only return schedule for todos not sheduled. Do not add already schedule tasks to this object. ";
+
+      // console.log(prompt);
+
+      run(prompt)
+
     }
+
+
+
+
   
   return (
     <div>
@@ -249,10 +349,6 @@ function Home() {
       <div id="loggedin"  hidden={!accessToken && !expiresIn}>
         <div id="homescreen">
           <div id="navbar">
-            {/* <div id="date-container"></div>
-            <button id="signout_button"   onClick={handleSignoutClick}>
-              <LogutIcons fill='#da2626' style={{ height:25, width: 25 }} />
-            </button> */}
             <div id="logoutButton"  onClick={handleSignoutClick}>
               <ArrowRight fill='#ebb6b6' style={{ height:30, width: 30,rotate:"180deg" }} />
             </div>

@@ -6,3 +6,38 @@
           </div>
 
           -----------------------------------------------------
+                  // 'timeMin': (new Date()).toISOString(),
+------------
+
+    // Flatten to string to display
+    // console.log(events);
+    // for(let eachEvent in events){
+    //   console.log(eachEvent);
+    // }
+
+
+    // const output = events.reduce(
+    //   (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,'\n');
+    // document.getElementById('content').innerText = output;
+    // document.getElementById('autorize_home').hidden = "true";
+    ----------------------------
+
+
+    {
+ "todos": [
+  {
+   "task": "Read Book",
+   "start_time": "9:00 AM",
+   "end_time": "9:30 AM"
+  },
+  {
+   "task": "Walk",
+   "start_time": "10:30 PM",
+   "end_time": "11:00 PM"
+  }
+ ]
+}
+
+
+--------------------------
+
