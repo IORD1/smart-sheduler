@@ -140,45 +140,51 @@ function Home() {
       document.getElementById('event_container').innerText = 'No events found.';
       return;
     }
-    document.getElementById("autorize_home").style.display = "none";
+    if(document.getElementById("autorize_home")){
+      document.getElementById("autorize_home").style.display = "none";
+    }
   }
   
-  function addManualEvent(){
+  function addManualEvent(eventName, eventLocation, eventDescription, startDateTime, endDateTime, attendeeEmail) {
     var event = {
       'kind': 'calendar#event',
-      'summary': 'Drive to work',
-      'location': 'Wardha',
-      'description': 'Get the keys, and start car',
+      'summary': eventName,
+      'location': eventLocation,
+      'description': eventDescription,
       'start': {
-        'dateTime': '2023-12-29T23:05:00.000Z',
+        'dateTime': startDateTime,
         'timeZone': 'UTC'
       },
       'end': {
-        'dateTime': '2023-12-29T23:35:00.000Z',
+        'dateTime': endDateTime,
         'timeZone': 'UTC'
       },
       'recurrence': [
         'RRULE:FREQ=DAILY;COUNT=1'
       ],
       'attendees': [
-        {'email': 'pratham111ingole@gmail.com','responseStatus':'needsAction'},
+        {'email': attendeeEmail, 'responseStatus': 'needsAction'},
       ],
       'reminders': {
         'useDefault': true,
       },
       "guestsCanSeeOtherGuests": true,
-    }
-
-      var request = gapi.client.calendar.events.insert({'calendarId': 'primary','resource': event,'sendUpdates': 'all'});
-      request.execute((event)=>{
-          console.log(event)
-          window.open(event.htmlLink)
-      },(error)=>{
-        console.error(error);
-      });
-
-    }
-
+    };
+  
+    var request = gapi.client.calendar.events.insert({
+      'calendarId': 'primary',
+      'resource': event,
+      'sendUpdates': 'all'
+    });
+  
+    request.execute((event) => {
+      console.log(event);
+      window.open(event.htmlLink);
+    }, (error) => {
+      console.error(error);
+    });
+  }
+   
 
 
 
@@ -282,11 +288,20 @@ function Home() {
       let modifiedString = trimmedTodoDataString.replace(/"\btodo\b"/g, '"task"');
       modifiedString = modifiedString.replace(/"\bname\b"/g, '"task"');
       modifiedString = modifiedString.replace(/"\bscheduled_todos\b"/g, '"todos"');
+      modifiedString = modifiedString.replace(/"\bschedule\b"/g, '"todos"');
 
 
       console.log(modifiedString);
       printTodos(modifiedString);
       // addManualEvent();
+      // addManualEvent(
+      //   'Meeting with Team',
+      //   'Office',
+      //   'Discuss project updates',
+      //   '2023-12-30T09:30:00.000Z',
+      //   '2023-12-30T11:00:00.000Z',
+      //   'pratham111ingole@gmail.com'
+      // );
     }
     
 
