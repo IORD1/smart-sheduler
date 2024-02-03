@@ -2,6 +2,8 @@ import { useEffect ,useState} from "react";
 import './Home.css';
 import Logo from "./Logo";
 import {ReactComponent as ArrowRight} from './assests/arrow_forward_FILL0_wght400_GRAD0_opsz24.svg';
+import {ReactComponent as AddTodo} from './assests/adddtodo.svg';
+
 import TodayDate from "./TodayDate";
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -77,7 +79,7 @@ function Home() {
 
   function handleAuthClick() {
     // document.getElementById("autorize_home").hidden = true;
-    document.getElementById("autorize_home").style.display = "none";
+    document.getElementById("autorize_home").style.hidden = true;
     tokenClient.callback = async (resp) => {
       if (resp.error) {
         throw (resp);
@@ -107,10 +109,14 @@ function Home() {
       gapi.client.setToken('');
       localStorage.clear();
     }
+
+    document.getElementById("loggedin").style.hidden= true;
+    document.getElementById("autorize_home").style.display = "inline";
+
   }
 
   async function listUpcomingEvents() {
-    // document.getElementById('autorize_home').hidden = "true";
+    // document.getElementById('  autorize_home').hidden = "true";
     let response;
     const today = new Date();
     // today.setHours(0, 0, 0, 0); // Set time to the beginning of the day
@@ -130,15 +136,19 @@ function Home() {
       };
       response = await gapi.client.calendar.events.list(request);
     } catch (err) {
-      document.getElementById('event_container').innerText = err.message;
+      if(document.getElementById("event_container")){
+        document.getElementById('event_container').innerText = err.message;
+      }
       return;
     }
 
     const events = response.result.items;
     setevetData(events);
-    if (!events || events.length === 0) {
-      document.getElementById('event_container').innerText = 'No events found.';
-      return;
+    if (!events || events.length === 0 ) {
+      if( document.getElementById("event_container")){
+        document.getElementById('event_container').append = 'No events found.';
+        return;
+      }
     }
     if(document.getElementById("autorize_home")){
       document.getElementById("autorize_home").style.display = "none";
@@ -161,9 +171,6 @@ function Home() {
       },
       'recurrence': [
         'RRULE:FREQ=DAILY;COUNT=1'
-      ],
-      'attendees': [
-        {'email': attendeeEmail, 'responseStatus': 'needsAction'},
       ],
       'reminders': {
         'useDefault': true,
@@ -254,6 +261,27 @@ function Home() {
       }
     }
 
+    function convertTimeStringToISO(timeString) {
+      const currentDate = new Date();
+      // console.log(timeString);
+    // Extract hours and minutes from the time string
+    const [time, period] = timeString.split(' ');
+    let [hours, minutes] = time.split(':');
+    //   console.log(hours);
+    //   console.log(minutes);
+    //   console.log(period);
+    // // Convert hours to 24-hour format if necessary
+    hours = period === 'PM' ? parseInt(hours, 10) + 12 : parseInt(hours, 10);
+      // console.log(hours);
+    // Set the time in the current date object
+    currentDate.setHours(hours, minutes, 0, 0);
+
+    // Format the date to ISO string
+    const isoTimeString = currentDate.toISOString();
+      // console.log(currentDate);
+    return isoTimeString;
+    }
+
     function printTodos(todoDataString) {
       try {
         // Parse the string into a JSON object
@@ -263,7 +291,15 @@ function Home() {
         if (todoData && todoData.todos && Array.isArray(todoData.todos)) {
           // Iterate over each todo and print its name and time
           todoData.todos.forEach(todo => {
-            console.log(`Todo: ${todo.task}, Start Time: ${todo.start_time}, End Time: ${todo.end_time}`);
+            console.log(`Todo: ${todo.task}, Start Time: ${((todo.start_time))}, End Time: ${todo.end_time}`);
+            addManualEvent(
+              todo.task,
+             'Office',
+             'Ai generated event',
+             convertTimeStringToISO(todo.start_time),
+             convertTimeStringToISO(todo.end_time),
+             'pratham111ingole@gmail.com'
+            );
           });
         } else {
           console.error('Invalid todo data format.');
@@ -291,17 +327,9 @@ function Home() {
       modifiedString = modifiedString.replace(/"\bschedule\b"/g, '"todos"');
 
 
-      console.log(modifiedString);
+      // console.log(modifiedString);
       printTodos(modifiedString);
-      // addManualEvent();
-      // addManualEvent(
-      //   'Meeting with Team',
-      //   'Office',
-      //   'Discuss project updates',
-      //   '2023-12-30T09:30:00.000Z',
-      //   '2023-12-30T11:00:00.000Z',
-      //   'pratham111ingole@gmail.com'
-      // );
+ 
     }
     
 
@@ -325,7 +353,10 @@ function Home() {
       + " Now create scheduled for the following todo. Also take in account the time it takes to complete each todo. The list of todos are : \n"
       + todoSentences.join('\n')
       + " .\n Return a json object consisting of list of scheduled todos and the starting and ending time for each task as per you."
-      + " The new schedule should not overlap with already sheduled tasks. Do not add the already scheduled task in this json object.  Take in account that I start working at 9 am till 10pm. Only return schedule for todos not sheduled. Do not add already schedule tasks to this object. ";
+      + " The new schedule should not overlap with already sheduled tasks. Do not add the already scheduled task in this json object.  Take in account that I start working at 9 am till 10pm. Only return schedule for todos not sheduled. Do not add already schedule tasks to this object. The name of object should be todos"
+      + " It should be in the following format where under todos  tag a list of tasks with task,start_time and end_time given. Follow the given format : "
+      + "{'todos': [{'task': 'Read Book','start_time': '9:00 AM','end_time': '9:30 AM'},{'task': 'Walk','start_time': '10:30 PM','end_time': '11:00 PM'}]}"
+      ;
 
       // console.log(prompt);
 
@@ -418,11 +449,12 @@ function Home() {
       </div>
     </div>
   );
-}
+} 
 
 
 function TodoInput({ onAddTodo }) {
   const [todoText, setTodoText] = useState('');
+ 
 
   function handleInputChange(e) {
     setTodoText(e.target.value);
@@ -453,7 +485,9 @@ function TodoInput({ onAddTodo }) {
         onChange={handleInputChange}
         id="todoInput"
       />
-      <button id="todoSend" onClick={handleAddTodo}>-</button>
+      <button id="todoSend" onClick={handleAddTodo}>
+        <AddTodo fill='' style={{ height:30, width: 30 }} />
+      </button>
     </div>
   );
 }
