@@ -10,8 +10,7 @@
 
 ##### Requires calendar access
 
-![Screenshot from 2024-02-04 00-27-01](https://github.com/IORD1/smart-sheduler/assets/91962775/08705311-309e-43ca-84c2-8141bb75565e)
-
+![Screenshot from 2024-02-04 00-31-43](https://github.com/IORD1/smart-sheduler/assets/91962775/fce28746-a21f-4321-96d4-f12d396c7e88)
 
 
 # Getting Started with Create React App
