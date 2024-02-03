@@ -2,7 +2,15 @@
 
 ## A Smart Way to Schedule Stuff
 
-![image](https://github.com/IORD1/smart-sheduler/assets/91962775/379d100f-e406-4e37-8647-94d86b36e1c7)
+#####  Add todos and duration with task_name @1 to add task for 1 hour duration
+![Screenshot from 2024-02-04 00-10-24](https://github.com/IORD1/smart-sheduler/assets/91962775/fd4114c2-7fbf-4833-9379-1f815fe305d4)
+
+##### Events get scheduled smartly directly onto to calendar by Google Geminis Ai
+![Screenshot from 2024-02-04 00-10-30](https://github.com/IORD1/smart-sheduler/assets/91962775/788ad0fb-55d7-4577-82cd-e7f45d486624)
+
+##### Requires calendar access
+
+![Screenshot from 2024-02-04 00-27-01](https://github.com/IORD1/smart-sheduler/assets/91962775/08705311-309e-43ca-84c2-8141bb75565e)
 
 
 
