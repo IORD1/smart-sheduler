@@ -11,6 +11,7 @@ function Home() {
   const [eventData, setevetData] = useState();
   const [activeTab, setActiveTab] = useState('schedule'); // 'schedule' or 'tasks'
   const [todos, setTodos] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const backgroundColors = ["#ec3a5a", "#fb8231", "#fdf9a0","#20bf6b","#349cdb","#3e6dd7","#8c59d0"];
   const fontColors = ["#ffffff","#ffffff","#0e0e0e","#ffffff","#ffffff","#ffffff","#ffffff",]
     const gapi = window.gapi;
@@ -331,14 +332,16 @@ function Home() {
 
       // console.log(modifiedString);
       printTodos(modifiedString);
- 
+      setIsLoading(false);
     }
+
+
     
 
 
     function sheduleEvents(){
       console.log("clicked");
-
+      setIsLoading(true);
       // console.log(eventData);
 
       const eventSentences = createEventSentences(eventData);
@@ -371,7 +374,7 @@ function Home() {
 
   
   return (
-    <div>
+    <div id="rootcontainer">
       <div id="autorize_home" >
         <div className="autorize_container">
           <div className="header">
@@ -393,6 +396,7 @@ function Home() {
           </div>
         </div>
       </div>
+     
 
       <div id="loggedin"  hidden={!accessToken && !expiresIn}>
         <div id="homescreen">
@@ -443,12 +447,19 @@ function Home() {
                 }) : <>No Data found</>}
           </div> ) : (
         <div id="tasks_container">
-          <TodoList todos={todos} />
+          <TodoList todos={todos} setTodos={setTodos} />
           <TodoInput onAddTodo={handleAddTodoClick} />
         </div>
       )}
+        {isLoading ? 
+      <div id="loaderbox">Loading...</div>
+    :
+          <></>
+
+    }
         </div>  
       </div>
+
     </div>
   );
 } 
@@ -494,9 +505,16 @@ function TodoInput({ onAddTodo }) {
   );
 }
 
-function TodoList({ todos }) {
+
+
+function TodoList({ todos , setTodos }) {
   const backgroundColors = ["#ec3a5a", "#fb8231", "#fdf9a0","#20bf6b","#349cdb","#3e6dd7","#8c59d0"];
-  const fontColors = ["#ffffff","#ffffff","#0e0e0e","#ffffff","#ffffff","#ffffff","#ffffff",]
+  const fontColors = ["#ffffff","#ffffff","#0e0e0e","#ffffff","#ffffff","#ffffff","#ffffff",];
+  function handleRemoveTodoClick(index) {
+    const newTodos = [...todos];
+    newTodos.splice(index, 1);
+    setTodos(newTodos);
+}
   return (
     <div className="todoListContainer">
         {todos.map((todo, index) => (
@@ -508,6 +526,7 @@ function TodoList({ todos }) {
             backgroundColor: backgroundColors[index % backgroundColors.length],
             borderRadius: `${index === 0 ? '5px 5px 0 0' : ''}${index === todos.length - 1 ? '0 0 5px 5px' : ''}`,
           }}
+          onClick={() => handleRemoveTodoClick(index)} // Add onClick event handler
           >
             <div id="taskIndex">{index+1}</div>
             <div id="taskSummary">{todo.task}</div>
