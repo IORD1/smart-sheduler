@@ -30,6 +30,8 @@ function Home() {
     //const expiryTime = new Date().getTime() + expiresIn * 1000;
     gapiLoaded();
     gisLoaded();
+    console.log(gisInited);
+    console.log(gapiInited);
     window.addEventListener('keydown', handleKeyDown);
     // Clean up the event listener when the component unmounts
     return () => {
