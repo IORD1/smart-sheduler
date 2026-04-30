@@ -4,6 +4,17 @@ import './globals.css';
 export const metadata = {
   title: 'Smart Scheduler',
   description: 'Brain dump. AI plans the day.',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Scheduler',
+  },
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export const viewport = {
@@ -11,6 +22,9 @@ export const viewport = {
   initialScale: 1,
   themeColor: '#09090C',
 };
+
+// Registers the service worker so Chrome offers the Install prompt.
+const swBootstrap = `if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})})}`;
 
 // Runs before first paint — applies theme + accent from localStorage so there's no flash.
 const themeBootstrap = `(function(){try{
@@ -33,6 +47,7 @@ export default function RootLayout({ children }) {
       <body>
         <Script src="https://apis.google.com/js/api.js" strategy="afterInteractive" />
         <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
+        <Script id="sw-register" strategy="afterInteractive">{swBootstrap}</Script>
         {children}
       </body>
     </html>

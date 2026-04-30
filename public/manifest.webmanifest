@@ -1,0 +1,25 @@
+{
+  "name": "Smart Scheduler",
+  "short_name": "Scheduler",
+  "description": "Brain dump. AI plans the day.",
+  "start_url": "/schedule",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#09090C",
+  "theme_color": "#09090C",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
