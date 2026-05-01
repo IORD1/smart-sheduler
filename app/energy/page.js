@@ -8,6 +8,7 @@ import Greeting from '../../components/ui/Greeting';
 import Icon from '../../components/ui/Icon';
 import Button from '../../components/ui/Button';
 import EnergyWindowRow from '../../components/features/EnergyWindowRow';
+import { EnergyWindowSkel, SkelStack } from '../../components/ui/Skeletons';
 import { useEnergy } from '../../hooks/useEnergy';
 
 const DEFAULT_WINDOWS = [
@@ -117,17 +118,7 @@ export default function EnergyPage() {
         style={{ flex: 1, padding: '0 16px', minHeight: 0 }}
       >
         {isLoading && draft.length === 0 ? (
-          <div
-            style={{
-              padding: '24px 8px',
-              color: 'var(--fg-3)',
-              fontSize: 12,
-              fontFamily: 'var(--font-mono)',
-              textAlign: 'center',
-            }}
-          >
-            Loading…
-          </div>
+          <SkelStack component={EnergyWindowSkel} count={5} />
         ) : (
           <div className="ss-stack ss-stack-tight">
             {draft.map((w, i) => (

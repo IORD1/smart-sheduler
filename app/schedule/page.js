@@ -11,8 +11,9 @@ import Icon from '../../components/ui/Icon';
 import ScheduleListView from '../../components/features/ScheduleListView';
 import ScheduleTimelineView from '../../components/features/ScheduleTimelineView';
 import ScheduleHybridView from '../../components/features/ScheduleHybridView';
+import { RowSkel, SkelStack } from '../../components/ui/Skeletons';
 import { useGoogleAuth } from '../../hooks/useGoogleAuth';
-import { listEventsToday } from '../../services/googleCalendar';
+import { listEventsTodayFromCalendars } from '../../services/googleCalendar';
 import { dateToHHMM } from '../../lib/time';
 import { classify } from '../../lib/categories';
 import { apiFetch } from '../../lib/userId';
@@ -39,7 +40,8 @@ function computeTodayLabels() {
 
 function toViewEvent(raw) {
   if (!raw?.start?.dateTime || !raw?.end?.dateTime) return null;
-  const title = raw.summary || '(no title)';
+  const fallback = raw.sourceIsPrimary === false ? 'Work Busy' : '(no title)';
+  const title = raw.summary || fallback;
   return {
     id: raw.id,
     title,
@@ -83,7 +85,8 @@ export default function SchedulePage() {
   const hasLoadedRef = useRef(false);
   const putTimerRef = useRef(null);
 
-  // Load events
+  // Load preferences (saved view + selected calendars) and events together,
+  // so we know which calendars to fetch before hitting the GCal API.
   useEffect(() => {
     if (!ready) return;
     if (!token) {
@@ -92,8 +95,39 @@ export default function SchedulePage() {
     }
     let cancelled = false;
     setLoading(true);
-    listEventsToday()
-      .then((items) => {
+    (async () => {
+      let calendarIds = ['primary'];
+      let initialView = 'list';
+      try {
+        const data = await apiFetch('/api/preferences');
+        if (data && typeof data === 'object') {
+          if (data.scheduleView && VIEW_INDEX[data.scheduleView] !== undefined) {
+            initialView = data.scheduleView;
+          }
+          if (Array.isArray(data.selectedCalendarIds)) {
+            calendarIds = ['primary', ...data.selectedCalendarIds];
+          }
+        }
+      } catch {
+        // fall back to defaults
+      }
+      if (cancelled) return;
+
+      setView(initialView);
+      requestAnimationFrame(() => {
+        const idx = VIEW_INDEX[initialView] ?? 0;
+        const slide = slideRefs.current[idx];
+        const root = carouselRef.current;
+        if (slide && root) {
+          root.scrollLeft = slide.offsetLeft;
+        }
+        requestAnimationFrame(() => {
+          hasLoadedRef.current = true;
+        });
+      });
+
+      try {
+        const items = await listEventsTodayFromCalendars(calendarIds);
         if (cancelled) return;
         const allDay = items.filter(isAllDay).map(toAllDayEvent);
         const mapped = items
@@ -102,59 +136,20 @@ export default function SchedulePage() {
           .filter(Boolean);
         setEvents(mapped);
         setAllDayEvents(allDay);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('failed to list events', err);
         if (!cancelled) {
           setEvents([]);
           setAllDayEvents([]);
         }
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    })();
     return () => {
       cancelled = true;
     };
   }, [ready, token, router]);
-
-  // Load saved view preference and scroll to it on first paint.
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      let initial = 'list';
-      try {
-        const data = await apiFetch('/api/preferences');
-        if (data && typeof data === 'object' && data.scheduleView) {
-          if (VIEW_INDEX[data.scheduleView] !== undefined) {
-            initial = data.scheduleView;
-          }
-        }
-      } catch {
-        // fall back to default 'list'
-      }
-      if (!alive) return;
-      setView(initial);
-      // Scroll to the matching slide instantly on first paint.
-      requestAnimationFrame(() => {
-        const idx = VIEW_INDEX[initial] ?? 0;
-        const slide = slideRefs.current[idx];
-        const root = carouselRef.current;
-        if (slide && root) {
-          // Use scrollLeft for guaranteed instant scroll without animation.
-          root.scrollLeft = slide.offsetLeft;
-        }
-        // Mark that the initial settle has occurred; allow PUTs after this.
-        // Defer one frame to let any IntersectionObserver fire spurious entries first.
-        requestAnimationFrame(() => {
-          hasLoadedRef.current = true;
-        });
-      });
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
 
   // IntersectionObserver — tracks which slide is most visible.
   useEffect(() => {
@@ -366,15 +361,12 @@ export default function SchedulePage() {
         <div
           style={{
             flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--fg-3)',
-            fontSize: 12,
-            fontFamily: 'var(--font-mono)',
+            minHeight: 0,
+            padding: '0 16px',
+            overflowY: 'auto',
           }}
         >
-          Loading…
+          <SkelStack component={RowSkel} count={5} />
         </div>
       ) : (
         <div

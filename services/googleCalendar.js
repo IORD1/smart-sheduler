@@ -242,26 +242,86 @@ function clearOnUnauthorized(err) {
   }
 }
 
-export async function listEventsToday() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
+// Returns the user's full calendar list — used by /settings to render
+// the per-calendar opt-in checkboxes.
+export async function listCalendars() {
   try {
-    const response = await gapi().client.calendar.events.list({
-      calendarId: 'primary',
-      timeMin: today.toISOString(),
-      timeMax: tomorrow.toISOString(),
-      showDeleted: false,
-      singleEvents: true,
-      maxResults: 25,
-      orderBy: 'startTime',
-    });
-    return response.result.items || [];
+    const response = await gapi().client.calendar.calendarList.list();
+    const items = response?.result?.items || [];
+    return items.map((c) => ({
+      id: c.id,
+      summary: c.summary || c.id,
+      primary: !!c.primary,
+      backgroundColor: c.backgroundColor || null,
+      accessRole: c.accessRole || null,
+    }));
   } catch (err) {
     clearOnUnauthorized(err);
     throw err;
   }
+}
+
+// Multi-calendar fetch. Failures on individual calendars (revoked access,
+// transient 5xx) are logged and skipped — the rest still render.
+export async function listEventsTodayFromCalendars(calendarIds) {
+  const ids = Array.isArray(calendarIds) && calendarIds.length > 0
+    ? calendarIds
+    : ['primary'];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const timeMin = today.toISOString();
+  const timeMax = tomorrow.toISOString();
+
+  const settled = await Promise.allSettled(
+    ids.map((id) =>
+      gapi().client.calendar.events.list({
+        calendarId: id,
+        timeMin,
+        timeMax,
+        showDeleted: false,
+        singleEvents: true,
+        maxResults: 25,
+        orderBy: 'startTime',
+      })
+    )
+  );
+
+  // If primary itself 401/403'd, treat it as auth failure (clear token).
+  // For secondaries, log + drop. Tag each event with its source calendar
+  // so the UI/AI can relabel cross-calendar "Busy" mirrors.
+  const merged = [];
+  settled.forEach((r, i) => {
+    const id = ids[i];
+    if (r.status === 'fulfilled') {
+      const items = r.value?.result?.items || [];
+      for (const item of items) {
+        merged.push({
+          ...item,
+          sourceCalendarId: id,
+          sourceIsPrimary: id === 'primary',
+        });
+      }
+    } else {
+      if (id === 'primary') {
+        clearOnUnauthorized(r.reason);
+        throw r.reason;
+      }
+      console.warn(`failed to fetch events for calendar ${id}:`, r.reason);
+    }
+  });
+
+  merged.sort((a, b) => {
+    const aStart = a.start?.dateTime || a.start?.date || '';
+    const bStart = b.start?.dateTime || b.start?.date || '';
+    return aStart.localeCompare(bStart);
+  });
+  return merged;
+}
+
+export async function listEventsToday() {
+  return listEventsTodayFromCalendars(['primary']);
 }
 
 export async function insertEvent({ summary, location, description, startISO, endISO, recurrence }) {

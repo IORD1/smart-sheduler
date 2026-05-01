@@ -14,12 +14,13 @@ import ChipComposer from '../../components/features/ChipComposer';
 import QuickAdd from '../../components/features/QuickAdd';
 import TodoRow from '../../components/features/TodoRow';
 import DraggableList from '../../components/features/DraggableList';
+import { RowSkel, SkelStack } from '../../components/ui/Skeletons';
 import { formatDuration } from '../../lib/time';
 import { useTodos } from '../../hooks/useTodos';
 
 export default function TasksPage() {
   const router = useRouter();
-  const { todos = [], addTodo, removeTodo, reorderTodos } = useTodos();
+  const { todos = [], isLoading, addTodo, removeTodo, reorderTodos } = useTodos();
   const [draft, setDraft] = useState('');
   // pendingDeletion: { id, task, timeoutId } | null
   // Holds the row that is hidden but not yet deleted on the server. The
@@ -109,21 +110,25 @@ export default function TasksPage() {
         className="ss-scroll"
         style={{ flex: 1, padding: '0 16px', minHeight: 0, position: 'relative' }}
       >
-        <div className="ss-stack ss-stack-tight">
-          <DraggableList
-            items={visibleTodos}
-            getId={(t) => t._id}
-            onReorder={(orderedIds) => reorderTodos(orderedIds)}
-            renderItem={(t, { dragHandleProps }) => (
-              <TodoRow
-                todo={t}
-                idx={t.position}
-                onRequestDelete={() => handleRequestDelete(t)}
-                dragHandleProps={dragHandleProps}
-              />
-            )}
-          />
-        </div>
+        {isLoading && visibleTodos.length === 0 ? (
+          <SkelStack component={RowSkel} count={3} />
+        ) : (
+          <div className="ss-stack ss-stack-tight">
+            <DraggableList
+              items={visibleTodos}
+              getId={(t) => t._id}
+              onReorder={(orderedIds) => reorderTodos(orderedIds)}
+              renderItem={(t, { dragHandleProps }) => (
+                <TodoRow
+                  todo={t}
+                  idx={t.position}
+                  onRequestDelete={() => handleRequestDelete(t)}
+                  dragHandleProps={dragHandleProps}
+                />
+              )}
+            />
+          </div>
+        )}
         <div style={{ height: 8 }} />
       </div>
 

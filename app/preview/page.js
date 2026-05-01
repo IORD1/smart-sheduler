@@ -9,11 +9,12 @@ import Icon from '../../components/ui/Icon';
 import AISummaryCard from '../../components/features/AISummaryCard';
 import ProposalRow from '../../components/features/ProposalRow';
 import DraggableList from '../../components/features/DraggableList';
+import { AISummarySkel, ProposalRowSkel, SkelStack } from '../../components/ui/Skeletons';
 import { dateToHHMM, tToMin, parseAmPmToISO, minToT, ampmToHHMM } from '../../lib/time';
 import { classify } from '../../lib/categories';
 import { apiFetch } from '../../lib/userId';
 import { useGoogleAuth } from '../../hooks/useGoogleAuth';
-import { listEventsToday, insertEvent } from '../../services/googleCalendar';
+import { listEventsTodayFromCalendars, insertEvent } from '../../services/googleCalendar';
 import { useTodos } from '../../hooks/useTodos';
 
 function eventStartHHMM(ev) {
@@ -29,12 +30,14 @@ function eventEndHHMM(ev) {
 }
 
 function simplifyEvent(ev) {
+  const fallback = ev.sourceIsPrimary === false ? 'Work Busy' : '(untitled)';
+  const title = ev.summary || fallback;
   return {
     id: ev.id,
-    title: ev.summary || '(untitled)',
+    title,
     start: eventStartHHMM(ev),
     end: eventEndHHMM(ev),
-    category: classify(ev.summary || ''),
+    category: classify(title),
   };
 }
 
@@ -73,7 +76,17 @@ export default function PreviewPage() {
       setLoading(true);
       setError(null);
       try {
-        const rawEvents = await listEventsToday();
+        let calendarIds = ['primary'];
+        try {
+          const prefs = await apiFetch('/api/preferences');
+          if (Array.isArray(prefs?.selectedCalendarIds)) {
+            calendarIds = ['primary', ...prefs.selectedCalendarIds];
+          }
+        } catch (_e) {
+          // fall back to primary
+        }
+
+        const rawEvents = await listEventsTodayFromCalendars(calendarIds);
         if (cancelled) return;
         setEvents(rawEvents);
         const simplified = rawEvents.map(simplifyEvent);
@@ -124,15 +137,19 @@ export default function PreviewPage() {
 
   const combined = useMemo(() => {
     if (!proposal) return [];
-    const existing = events.map((ev) => ({
-      id: ev.id,
-      title: ev.summary || '(untitled)',
-      start: eventStartHHMM(ev),
-      end: eventEndHHMM(ev),
-      category: classify(ev.summary || ''),
-      locked: true,
-      new: false,
-    }));
+    const existing = events.map((ev) => {
+      const fallback = ev.sourceIsPrimary === false ? 'Work Busy' : '(untitled)';
+      const title = ev.summary || fallback;
+      return {
+        id: ev.id,
+        title,
+        start: eventStartHHMM(ev),
+        end: eventEndHHMM(ev),
+        category: classify(title),
+        locked: true,
+        new: false,
+      };
+    });
     const newOnes = proposal.items.map((p, idx) => {
       const rawStart = p.start_time || p.start;
       const rawEnd = p.end_time || p.end;
@@ -365,17 +382,15 @@ export default function PreviewPage() {
           </Button>
         </div>
       ) : loading ? (
-        <div
-          style={{
-            flex: 1,
-            display: 'grid',
-            placeItems: 'center',
-            color: 'var(--fg-2)',
-            fontSize: 13,
-          }}
-        >
-          Loading…
-        </div>
+        <>
+          <AISummarySkel />
+          <div
+            className="ss-scroll"
+            style={{ flex: 1, minHeight: 0, padding: '0 16px' }}
+          >
+            <SkelStack component={ProposalRowSkel} count={4} />
+          </div>
+        </>
       ) : error ? (
         <div
           style={{
