@@ -1,7 +1,13 @@
 import { getCollection, getUserId } from '../../../lib/mongo';
 import { apiError, handleRoute } from '../../../lib/api';
 
-const DEFAULTS = { theme: 'dark', accent: 'lime', scheduleView: 'list', dismissedSuggestions: [] };
+const DEFAULTS = {
+  theme: 'dark',
+  accent: 'lime',
+  scheduleView: 'list',
+  dismissedSuggestions: [],
+  selectedCalendarIds: [],
+};
 const ALLOWED_THEMES = ['dark', 'light'];
 const ALLOWED_ACCENTS = ['lime', 'sky', 'rose', 'amber'];
 const ALLOWED_SCHEDULE_VIEWS = ['list', 'timeline', 'hybrid'];
@@ -11,6 +17,7 @@ const VALIDATORS = {
   accent: (v) => ALLOWED_ACCENTS.includes(v),
   scheduleView: (v) => ALLOWED_SCHEDULE_VIEWS.includes(v),
   dismissedSuggestions: (v) => Array.isArray(v) && v.every((x) => typeof x === 'string'),
+  selectedCalendarIds: (v) => Array.isArray(v) && v.every((x) => typeof x === 'string'),
 };
 
 const ALLOWED_MESSAGES = {
@@ -18,6 +25,7 @@ const ALLOWED_MESSAGES = {
   accent: `accent must be one of ${ALLOWED_ACCENTS.join(', ')}`,
   scheduleView: `scheduleView must be one of ${ALLOWED_SCHEDULE_VIEWS.join(', ')}`,
   dismissedSuggestions: 'dismissedSuggestions must be an array of strings',
+  selectedCalendarIds: 'selectedCalendarIds must be an array of strings',
 };
 
 export const GET = handleRoute(async (request) => {
@@ -33,6 +41,9 @@ export const GET = handleRoute(async (request) => {
       ? doc.scheduleView
       : DEFAULTS.scheduleView,
     dismissedSuggestions: Array.isArray(doc.dismissedSuggestions) ? doc.dismissedSuggestions : [],
+    selectedCalendarIds: Array.isArray(doc.selectedCalendarIds)
+      ? doc.selectedCalendarIds.filter((x) => typeof x === 'string')
+      : [],
   });
 });
 

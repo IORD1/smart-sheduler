@@ -8,6 +8,7 @@ import AppHeader from '../../components/ui/AppHeader';
 import Greeting from '../../components/ui/Greeting';
 import Icon from '../../components/ui/Icon';
 import SuggestionCard from '../../components/features/SuggestionCard';
+import { SuggestionCardSkel, SkelStack } from '../../components/ui/Skeletons';
 import { apiFetch } from '../../lib/userId';
 
 // Map a suggestion id to a dispatch kind. Suggestions emitted by lib/suggestions.js
@@ -174,16 +175,8 @@ export default function SuggestionsPage() {
         className="ss-scroll"
       >
         {suggestions === null ? (
-          <div
-            style={{
-              padding: '24px 8px',
-              color: 'var(--fg-3)',
-              fontSize: 12,
-              fontFamily: 'var(--font-mono)',
-              textAlign: 'center',
-            }}
-          >
-            Loading…
+          <div className="ss-stack ss-stack-loose">
+            <SkelStack component={SuggestionCardSkel} count={3} />
           </div>
         ) : (
           <div className="ss-stack ss-stack-loose">
