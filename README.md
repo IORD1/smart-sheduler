@@ -1,15 +1,9 @@
 ## A Smart Way to Schedule Stuff
 
 </br>
-
-<img width="1920" height="1080" alt="login" src="https://github.com/user-attachments/assets/93bbc2eb-57f8-4e4f-8db0-4367ee1dfc20" />
+<img width="1920" height="1440" alt="532shots_so" src="https://github.com/user-attachments/assets/67eef741-26e0-4fcf-b36b-d82325faf836" />
 </br>
-<img width="1920" height="1920" alt="todo" src="https://github.com/user-attachments/assets/0d14a01a-f86a-424b-bbd3-9c44e86727c6" /> 
-    </br>
-<img width="1920" height="1920" alt="timeline" src="https://github.com/user-attachments/assets/0c9c6afd-9773-45af-a27a-565868aa3a51" />
+<img width="1920" height="1440" alt="405shots_so" src="https://github.com/user-attachments/assets/d696f578-c5c1-44b4-a9bb-d28ba1030224" />
 </br>
-
-<img width="1920" height="1920" alt="settings" src="https://github.com/user-attachments/assets/e5add000-1ccf-4377-a1e4-54a36cc92037" />
-</br>
-<img width="1920" height="1920" alt="light" src="https://github.com/user-attachments/assets/68d7356f-82bc-4107-91dd-a1fbea8535d9" />
+<img width="1920" height="1440" alt="517shots_so" src="https://github.com/user-attachments/assets/46bbdc37-c828-47a3-9301-953413ff4c17" />
 
